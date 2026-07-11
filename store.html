@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Store — Perkmc</title>
+<meta name="description" content="Support Perkmc and grab ranks, gems and cosmetics in the official store.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌲</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Bangers&family=Luckiest+Guy&family=Press+Start+2P&family=Orbitron:wght@600;700;800&family=Russo+One&family=Bebas+Neue&family=Titan+One&family=Bungee&family=Rubik+Mono+One&family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=Work+Sans:wght@400;500;600&family=Mulish:wght@400;500;600&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main>
+  <section class="page-hero">
+    <span class="pill-badge">🛒 Support The Server</span>
+    <h1>Perkmc Store</h1>
+    <p>Every purchase helps keep the server running 24/7. All payments are final — see our rules for details. 💚</p>
+  </section>
+
+  <section style="padding-top:10px;">
+    <div class="container">
+      <div class="grid grid-3" id="storeGrid"></div>
+
+      <div class="card" style="margin-top:30px; display:flex; gap:16px; align-items:center;">
+        <div class="emoji-badge" style="margin:0;">🔒</div>
+        <div>
+          <h3 style="margin-bottom:4px;">Safe & Secure Checkout</h3>
+          <p style="margin:0;">This is a demo storefront — wire it up to your real payment processor (Tebex, PayPal, Stripe, etc.) before going live.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="config.js"></script>
+<script src="store-icons.js"></script>
+<script src="common.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const cfg = perkmcGetConfig();
+    const grid = document.getElementById("storeGrid");
+    grid.innerHTML = cfg.storeItems.map(item => `
+      <div class="card store-card" style="--card-color:${item.color}">
+        <span class="store-tag" style="--card-color:${item.color}">${item.tag}</span>
+        <div class="store-icon-wrap">${perkmcStoreIcon(item.icon)}</div>
+        <h3>${item.name}</h3>
+        <div class="store-price">${item.price}</div>
+        <ul class="store-perks">
+          ${item.perks.map(p => `<li>${p}</li>`).join("")}
+        </ul>
+        <button class="btn btn-primary btn-block" onclick="perkmcStoreBuyClick('${item.name.replace(/'/g, "\\'")}')">🛒 Buy Now</button>
+      </div>
+    `).join("");
+  });
+
+  function perkmcStoreBuyClick(itemName) {
+    const username = localStorage.getItem("perkmcUsername");
+    perkmcTrack("store_buy_click", { item: itemName });
+    if (!username) {
+      perkmcShowUsernameModal();
+      return;
+    }
+    alert(`Thanks, ${username}! This store isn't connected to a real payment processor yet — set up a free Tebex or CraftingStore account and wire this button to their checkout to accept real payments and auto-deliver "${itemName}" in-game.`);
+  }
+</script>
+</body>
+</html>

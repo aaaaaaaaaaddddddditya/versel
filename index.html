@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perkmc — Minecraft Survival Redefined</title>
+<meta name="description" content="Perkmc is a Minecraft survival server with towns, custom enchants, weekly events and a friendly active community. Join today!">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌲</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Bangers&family=Luckiest+Guy&family=Press+Start+2P&family=Orbitron:wght@600;700;800&family=Russo+One&family=Bebas+Neue&family=Titan+One&family=Bungee&family=Rubik+Mono+One&family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=Work+Sans:wght@400;500;600&family=Mulish:wght@400;500;600&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main>
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <!-- ===== CRAZY ANIMATED NEON EMBLEM ===== -->
+    <svg class="hero-emblem" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="neonG" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#2bff9b"/>
+          <stop offset="50%" stop-color="#26e6ff"/>
+          <stop offset="100%" stop-color="#a970ff"/>
+        </linearGradient>
+        <radialGradient id="coreG" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#eafcff"/>
+          <stop offset="35%" stop-color="#2bff9b"/>
+          <stop offset="100%" stop-color="#0bd0a6" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- outer dashed ring, rotating -->
+      <g filter="url(#glow)">
+        <circle cx="200" cy="200" r="170" fill="none" stroke="url(#neonG)" stroke-width="2"
+                stroke-dasharray="4 22" opacity="0.8">
+          <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="24s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- mid ring, counter-rotating with dash march -->
+        <circle cx="200" cy="200" r="132" fill="none" stroke="url(#neonG)" stroke-width="3"
+                stroke-dasharray="60 400" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="0" to="460" dur="6s" repeatCount="indefinite"/>
+          <animateTransform attributeName="transform" type="rotate" from="360 200 200" to="0 200 200" dur="18s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- rotating hexagon -->
+        <polygon points="200,92 293,146 293,254 200,308 107,254 107,146" fill="none"
+                 stroke="#26e6ff" stroke-width="2.5" opacity="0.85">
+          <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="30s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.4;0.95;0.4" dur="4s" repeatCount="indefinite"/>
+        </polygon>
+
+        <!-- inner rotating triangle -->
+        <polygon points="200,120 269,250 131,250" fill="none" stroke="#a970ff" stroke-width="2.5" opacity="0.8">
+          <animateTransform attributeName="transform" type="rotate" from="360 200 200" to="0 200 200" dur="20s" repeatCount="indefinite"/>
+        </polygon>
+
+        <!-- orbiting particles -->
+        <g>
+          <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="8s" repeatCount="indefinite"/>
+          <circle cx="200" cy="30" r="5" fill="#2bff9b"/>
+          <circle cx="200" cy="370" r="4" fill="#26e6ff"/>
+        </g>
+        <g>
+          <animateTransform attributeName="transform" type="rotate" from="360 200 200" to="0 200 200" dur="12s" repeatCount="indefinite"/>
+          <circle cx="60" cy="200" r="4" fill="#a970ff"/>
+          <circle cx="340" cy="200" r="4.5" fill="#ff5ed3"/>
+        </g>
+
+        <!-- pulsing core -->
+        <circle cx="200" cy="200" r="60" fill="url(#coreG)">
+          <animate attributeName="r" values="52;70;52" dur="3.4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.75;1;0.75" dur="3.4s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- core glyph: stylized pine / spark -->
+        <path d="M200 158 L224 224 L200 210 L176 224 Z" fill="#eafcff" opacity="0.95">
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/>
+        </path>
+      </g>
+    </svg>
+
+    <div class="hero-content">
+      <span class="pill-badge">🌲 MINECRAFT SURVIVAL REDEFINED</span>
+      <h1>
+        Welcome to the<br>
+        <span class="highlight" id="heroHighlight">Perkmc Community</span>
+      </h1>
+      <p class="hero-subtitle" id="heroSubtitle">Survival, towns, weekly events &amp; a community that actually feels like home. 🍃</p>
+      <div class="hero-actions">
+        <a href="discord.html" class="btn btn-primary">▶️ Join Now</a>
+        <a href="store.html" class="btn btn-ghost">🛍️ View Store</a>
+      </div>
+      <span class="pill-badge">🟢 <span data-players-online>152</span> / <span data-players-max>500</span> Players Online</span>
+    </div>
+  </section>
+
+  <!-- ================= IP STRIP ================= -->
+  <section style="padding: 40px 0;">
+    <div class="container text-center">
+      <div class="ip-box">
+        🖥️ <span data-server-ip>play.perkmc.net</span>
+        <button class="ip-copy" id="copyIpHome">📋 Copy IP</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STATS ================= -->
+  <div class="container">
+    <div class="stats-strip">
+      <div class="stat"><div class="num">7+</div><div class="label">🌐 Game Modes</div></div>
+      <div class="stat"><div class="num">500+</div><div class="label">🧑‍🤝‍🧑 Community Members</div></div>
+      <div class="stat"><div class="num">24/7</div><div class="label">⚡ Uptime</div></div>
+      <div class="stat"><div class="num">3</div><div class="label">📅 Years Running</div></div>
+    </div>
+  </div>
+
+  <!-- ================= FEATURES ================= -->
+  <section id="features">
+    <div class="container">
+      <div class="section-head">
+        <span class="pill-badge">✨ Why Perkmc</span>
+        <h2>Everything you need for the perfect survival experience</h2>
+        <p>A hand-picked set of features built for long-term, cozy survival gameplay. 🌿</p>
+      </div>
+      <div class="grid grid-3" id="featuresGrid"></div>
+    </div>
+  </section>
+
+  <!-- ================= LATEST ANNOUNCEMENT PREVIEW ================= -->
+  <section style="background: var(--bg-panel);">
+    <div class="container">
+      <div class="section-head">
+        <span class="pill-badge">📢 Fresh News</span>
+        <h2>Latest Announcements</h2>
+      </div>
+      <div class="grid grid-3" id="announcementPreview"></div>
+      <p class="text-center" style="margin-top:30px;">
+        <a href="announcements.html" class="btn btn-outline">📜 View All Announcements</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= CTA ================= -->
+  <section>
+    <div class="container">
+      <div class="discord-panel">
+        <span class="pill-badge">💬 500+ Members</span>
+        <h2>Join our Discord & the adventure begins</h2>
+        <p>Get announcements, vote for events, chat with staff and make new friends. 🤝</p>
+        <div class="hero-actions" style="margin-top:24px;">
+          <a href="discord.html" class="btn btn-primary">💬 Join Discord</a>
+          <a href="rules.html" class="btn btn-outline">📖 Read the Rules</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const cfg = perkmcGetConfig();
+
+    document.getElementById("heroHighlight").textContent = cfg.heroTitleHighlight;
+    document.getElementById("heroSubtitle").textContent = cfg.heroSubtitle;
+
+    // Features
+    const fGrid = document.getElementById("featuresGrid");
+    fGrid.innerHTML = cfg.features.map(f => `
+      <div class="card">
+        <div class="emoji-badge">${f.emoji}</div>
+        <h3>${f.title}</h3>
+        <p>${f.desc}</p>
+      </div>`).join("");
+
+    // Announcement previews (latest 3)
+    const aGrid = document.getElementById("announcementPreview");
+    const latest = [...cfg.announcements].slice(0, 3);
+    aGrid.innerHTML = latest.map(a => `
+      <div class="card announcement-card">
+        <div class="announcement-emoji">${a.emoji}</div>
+        <div>
+          <div class="announcement-meta">
+            <span class="announcement-tag">${a.tag}</span>
+            <span class="announcement-date">📅 ${a.date}</span>
+          </div>
+          <h3 style="font-size:1.05rem;">${a.title}</h3>
+          <p style="font-size:0.92rem;">${a.body.slice(0, 90)}${a.body.length > 90 ? "…" : ""}</p>
+        </div>
+      </div>`).join("");
+
+    const copyBtn = document.getElementById("copyIpHome");
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard?.writeText(cfg.serverIpJava).then(() => {
+        copyBtn.innerHTML = "✅ Copied!";
+        setTimeout(() => (copyBtn.innerHTML = "📋 Copy IP"), 1500);
+        perkmcTrack("ip_copy", { ip: cfg.serverIpJava, location: "home_hero" });
+      });
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Perkmc</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌲</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Bangers&family=Luckiest+Guy&family=Press+Start+2P&family=Orbitron:wght@600;700;800&family=Russo+One&family=Bebas+Neue&family=Titan+One&family=Bungee&family=Rubik+Mono+One&family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=Work+Sans:wght@400;500;600&family=Mulish:wght@400;500;600&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+
+<!-- ================= LOGIN SCREEN ================= -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="emoji-badge" style="width:60px;height:60px;font-size:2rem;margin:0 auto 16px;">🔒</div>
+    <h2 style="margin-bottom:4px;">Perkmc Admin</h2>
+    <p class="muted" style="margin-top:0;">Enter the admin password to continue.</p>
+    <input type="password" id="loginPassword" placeholder="Admin password" autocomplete="current-password">
+    <div class="login-error" id="loginError"></div>
+    <button class="btn btn-primary btn-block" id="loginBtn">🔑 Login</button>
+    <p class="muted" style="margin-top:16px; font-size:0.78rem;">Default password: <code>perkmc123</code> — change it in Security settings after logging in.</p>
+    <p class="muted" style="font-size:0.78rem;"><a href="index.html" style="text-decoration:underline;">← Back to site</a></p>
+  </div>
+</div>
+
+<!-- ================= ADMIN SHELL ================= -->
+<div class="admin-shell" id="adminShell" style="display:none;">
+  <aside class="admin-sidebar">
+    <div class="brand"><span class="brand-mark">🌲</span><span class="brand-name">Perkmc</span></div>
+
+    <button class="admin-nav-btn active" data-tab="dashboard">📊 Dashboard</button>
+    <button class="admin-nav-btn" data-tab="console">🖥️ Live Console</button>
+    <button class="admin-nav-btn" data-tab="settings">⚙️ Server Settings</button>
+    <button class="admin-nav-btn" data-tab="staff">🛡️ Staff Management</button>
+    <button class="admin-nav-btn" data-tab="categories">🗂️ Staff Categories</button>
+    <button class="admin-nav-btn" data-tab="announcements">📢 Announcements</button>
+    <button class="admin-nav-btn" data-tab="store">🛒 Store Items</button>
+    <button class="admin-nav-btn" data-tab="rules">📖 Rules</button>
+    <button class="admin-nav-btn" data-tab="appearance">🎨 Appearance &amp; Fonts</button>
+    <button class="admin-nav-btn" data-tab="security">🔐 Security</button>
+
+    <hr style="border-color: var(--border-soft); margin: 16px 0;">
+    <a href="index.html" class="admin-nav-btn" style="display:flex;">🏠 View Site</a>
+    <button class="admin-nav-btn" id="logoutBtn">🚪 Log Out</button>
+  </aside>
+
+  <main class="admin-main">
+
+    <!-- DASHBOARD -->
+    <section class="admin-panel-view active" id="tab-dashboard">
+      <div class="admin-topbar"><h2>📊 Dashboard</h2></div>
+      <div class="grid grid-3" id="dashboardStats"></div>
+      <div class="card" style="margin-top:24px;">
+        <h3>👋 Welcome to your Admin Panel</h3>
+        <p>Use the sidebar to change your server IP, manage staff, post announcements, edit store items &amp; rules, and pick site fonts. Every change saves instantly and shows up live on the site (in this browser).</p>
+        <p class="muted">⚠️ This panel stores data in this browser's local storage. It's perfect for a solo owner or small team editing from one device. If several people need to manage the site from different devices, you'll eventually want a real backend — see the README.</p>
+      </div>
+    </section>
+
+    <!-- CONSOLE -->
+    <section class="admin-panel-view" id="tab-console">
+      <div class="admin-topbar"><h2>🖥️ Live Console</h2></div>
+
+      <div class="card" id="consoleSetupNotice" style="display:none;">
+        <h3>⚠️ Not connected yet</h3>
+        <p>The Live Console needs a free Firebase project to show real visitor activity — right now it has nothing to read from. Open <code>firebase-config.js</code> in your site files and follow the numbered steps in the comment at the top, then reload this page.</p>
+      </div>
+
+      <div class="grid grid-3" id="consoleStats" style="margin-bottom:18px;"></div>
+
+      <div class="card">
+        <h3 style="margin-bottom:10px;">👥 Players Seen</h3>
+        <table class="data-table">
+          <thead><tr><th>Player</th><th>Last Seen</th><th>Events</th></tr></thead>
+          <tbody id="consolePlayersBody"></tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top:20px;">
+        <h3 style="margin-bottom:10px;">📜 Live Activity Feed</h3>
+        <p class="muted" style="margin-top:0;">Real visitor actions on your live site — page views, IP copies, username entries, store clicks — updating live, newest first.</p>
+        <table class="data-table">
+          <thead><tr><th>Time</th><th>Player</th><th>Action</th><th>Details</th><th>Page</th></tr></thead>
+          <tbody id="consoleFeedBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="admin-panel-view" id="tab-settings">
+      <div class="admin-topbar"><h2>⚙️ Server Settings</h2><button class="btn btn-primary btn-sm" id="saveSettings">💾 Save Changes</button></div>
+      <div class="card">
+        <div class="form-grid">
+          <div class="form-field"><label>🏷️ Site Name</label><input id="f-siteName"></div>
+          <div class="form-field"><label>🏷️ Tagline</label><input id="f-tagline"></div>
+          <div class="form-field"><label>🖥️ Server IP (Java)</label><input id="f-ipJava"></div>
+          <div class="form-field"><label>🎮 Server IP (Bedrock)</label><input id="f-ipBedrock"></div>
+          <div class="form-field"><label>🧱 Version</label><input id="f-version"></div>
+          <div class="form-field"><label>🟢 Players Online</label><input id="f-playersOnline" type="number"></div>
+          <div class="form-field"><label>👥 Players Max</label><input id="f-playersMax" type="number"></div>
+          <div class="form-field"><label>💬 Discord Invite URL</label><input id="f-discordInvite"></div>
+          <div class="form-field"><label>🌟 Hero Highlight Text</label><input id="f-heroHighlight"></div>
+          <div class="form-field"><label>📝 Hero Subtitle</label><input id="f-heroSubtitle"></div>
+        </div>
+        <h3 style="margin-top:10px;">🔗 Social Links</h3>
+        <div class="form-grid">
+          <div class="form-field"><label>💬 Discord</label><input id="f-social-discord"></div>
+          <div class="form-field"><label>📺 YouTube</label><input id="f-social-youtube"></div>
+          <div class="form-field"><label>🎵 TikTok</label><input id="f-social-tiktok"></div>
+          <div class="form-field"><label>📸 Instagram</label><input id="f-social-instagram"></div>
+          <div class="form-field"><label>🐦 Twitter / X</label><input id="f-social-twitter"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAFF -->
+    <section class="admin-panel-view" id="tab-staff">
+      <div class="admin-topbar"><h2>🛡️ Staff Management</h2><button class="btn btn-primary btn-sm" id="addStaffBtn">➕ Add Staff Member</button></div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Emoji</th><th>Name</th><th>Category</th><th>Note</th><th>Actions</th></tr></thead>
+          <tbody id="staffTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="admin-panel-view" id="tab-categories">
+      <div class="admin-topbar"><h2>🗂️ Staff Categories</h2></div>
+      <div class="card">
+        <p class="muted">Create ranks/categories like Helper, Moderator, Admin, Builder, etc. Order here controls display order on the Staff page.</p>
+        <div class="form-grid" style="grid-template-columns: 2fr 1fr;">
+          <div class="form-field"><label>New category name</label><input id="f-newCategory" placeholder="e.g. Head Admin"></div>
+          <div class="form-field"><label>&nbsp;</label><button class="btn btn-primary" id="addCategoryBtn">➕ Add Category</button></div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Category</th><th>Members</th><th>Actions</th></tr></thead>
+          <tbody id="categoryTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ANNOUNCEMENTS -->
+    <section class="admin-panel-view" id="tab-announcements">
+      <div class="admin-topbar"><h2>📢 Announcements</h2><button class="btn btn-primary btn-sm" id="addAnnouncementBtn">➕ New Announcement</button></div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Emoji</th><th>Title</th><th>Tag</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="announcementTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- STORE -->
+    <section class="admin-panel-view" id="tab-store">
+      <div class="admin-topbar"><h2>🛒 Store Items</h2><button class="btn btn-primary btn-sm" id="addStoreBtn">➕ New Item</button></div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Emoji</th><th>Name</th><th>Price</th><th>Tag</th><th>Actions</th></tr></thead>
+          <tbody id="storeTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- RULES -->
+    <section class="admin-panel-view" id="tab-rules">
+      <div class="admin-topbar"><h2>📖 Rules</h2><button class="btn btn-primary btn-sm" id="addRuleGroupBtn">➕ New Rule Category</button></div>
+      <div id="rulesAdminList"></div>
+    </section>
+
+    <!-- APPEARANCE -->
+    <section class="admin-panel-view" id="tab-appearance">
+      <div class="admin-topbar"><h2>🎨 Appearance &amp; Fonts</h2></div>
+      <div class="card">
+        <h3>🔠 Heading / Display Font <span class="badge-count" id="headingFontCount"></span></h3>
+        <p class="muted">Used for big titles, the logo and section headings.</p>
+        <div class="font-preview-grid" id="headingFontGrid"></div>
+      </div>
+      <div class="card" style="margin-top:20px;">
+        <h3>🔡 Body / Small Font <span class="badge-count" id="smallFontCount"></span></h3>
+        <p class="muted">Used for paragraphs, buttons and small text.</p>
+        <div class="font-preview-grid" id="smallFontGrid"></div>
+      </div>
+      <div class="card" style="margin-top:20px;">
+        <h3>😀 Emoji Library</h3>
+        <p class="muted">Click any emoji to copy it, then paste it into names, notes, titles or rules anywhere in this panel.</p>
+        <div class="emoji-picker" id="emojiLibrary" style="max-width:100%;"></div>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section class="admin-panel-view" id="tab-security">
+      <div class="admin-topbar"><h2>🔐 Security</h2></div>
+      <div class="card" style="max-width:420px;">
+        <h3>Change Admin Password</h3>
+        <div class="form-field"><label>New password</label><input type="password" id="f-newPassword"></div>
+        <div class="form-field"><label>Confirm new password</label><input type="password" id="f-confirmPassword"></div>
+        <div class="login-error" id="passwordError"></div>
+        <button class="btn btn-primary" id="changePasswordBtn">💾 Update Password</button>
+        <p class="muted" style="margin-top:14px;">This password only protects this Admin Panel from casual visitors — it is not a substitute for real authentication. Anyone with access to this browser profile or the page source can bypass it. Don't use it to guard sensitive data.</p>
+      </div>
+      <div class="card" style="margin-top:20px; max-width:420px;">
+        <h3>♻️ Reset Everything</h3>
+        <p class="muted">Wipes all saved settings, staff, announcements &amp; store items back to the sample defaults.</p>
+        <button class="btn btn-danger" id="resetAllBtn">⚠️ Reset to Defaults</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ================= MODAL (used for add/edit forms) ================= -->
+<div id="modalOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+  <div class="card" id="modalBox" style="max-width:480px; width:100%; max-height:85vh; overflow-y:auto;">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="config.js"></script>
+<script src="store-icons.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

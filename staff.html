@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Team — Perkmc</title>
+<meta name="description" content="Meet the Perkmc staff team — owners, managers, admins, moderators, helpers and builders.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌲</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Bangers&family=Luckiest+Guy&family=Press+Start+2P&family=Orbitron:wght@600;700;800&family=Russo+One&family=Bebas+Neue&family=Titan+One&family=Bungee&family=Rubik+Mono+One&family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=Work+Sans:wght@400;500;600&family=Mulish:wght@400;500;600&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main>
+  <section class="page-hero">
+    <span class="pill-badge">🛡️ The People Behind Perkmc</span>
+    <h1>Our Staff Team</h1>
+    <p>A friendly, active team keeping the server fair, fun and running smoothly. 🌿</p>
+  </section>
+
+  <section style="padding-top: 10px;">
+    <div class="container">
+      <div id="staffContainer"></div>
+
+      <div class="card text-center" style="margin-top:20px;">
+        <h3>🙌 Want to join the team?</h3>
+        <p>We open staff applications periodically on our Discord — keep an eye on the announcements page!</p>
+        <a href="discord.html" class="btn btn-primary">💬 Apply on Discord</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const cfg = perkmcGetConfig();
+    const container = document.getElementById("staffContainer");
+
+    // Group staff by category, preserving the configured category order
+    const groups = {};
+    cfg.staffCategories.forEach(c => groups[c] = []);
+    cfg.staff.forEach(member => {
+      if (!groups[member.category]) groups[member.category] = [];
+      groups[member.category].push(member);
+    });
+
+    const categoryEmojis = {
+      Owner: "👑", Manager: "🧭", Admin: "🛡️", Moderator: "🔨",
+      Helper: "🌿", Builder: "🧱", Support: "🎧"
+    };
+
+    container.innerHTML = Object.entries(groups)
+      .filter(([, members]) => members.length)
+      .map(([category, members]) => `
+        <div class="staff-category">
+          <h3>${categoryEmojis[category] || "⭐"} ${category}</h3>
+          <div class="grid grid-4">
+            ${members.map(m => `
+              <div class="card staff-card">
+                <div class="staff-avatar">${m.emoji || "🙂"}</div>
+                <h4>${m.name}</h4>
+                <div class="staff-role">${m.category}</div>
+                <p style="font-size:0.88rem;">${m.note || ""}</p>
+              </div>`).join("")}
+          </div>
+        </div>
+      `).join("");
+  });
+</script>
+</body>
+</html>

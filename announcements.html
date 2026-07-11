@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Announcements — Perkmc</title>
+<meta name="description" content="The latest Perkmc announcements — updates, events, store news and more.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌲</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Bangers&family=Luckiest+Guy&family=Press+Start+2P&family=Orbitron:wght@600;700;800&family=Russo+One&family=Bebas+Neue&family=Titan+One&family=Bungee&family=Rubik+Mono+One&family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=Work+Sans:wght@400;500;600&family=Mulish:wght@400;500;600&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main>
+  <section class="page-hero">
+    <span class="pill-badge">📢 Stay In The Loop</span>
+    <h1>Announcements</h1>
+    <p>Every update, event and news post from the Perkmc team. Managed live from the Admin Panel. 🛠️</p>
+  </section>
+
+  <section style="padding-top:10px;">
+    <div class="container" style="max-width: 820px;">
+      <div id="announcementsList"></div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const cfg = perkmcGetConfig();
+    const list = document.getElementById("announcementsList");
+    const sorted = [...cfg.announcements].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (!sorted.length) {
+      list.innerHTML = `<p class="text-center muted">No announcements yet — check back soon! 🌱</p>`;
+      return;
+    }
+
+    list.innerHTML = sorted.map(a => `
+      <div class="card announcement-card" style="margin-bottom:20px;">
+        <div class="announcement-emoji">${a.emoji}</div>
+        <div>
+          <div class="announcement-meta">
+            <span class="announcement-tag">${a.tag}</span>
+            <span class="announcement-date">📅 ${a.date}</span>
+          </div>
+          <h3 style="font-size:1.2rem;">${a.title}</h3>
+          <p>${a.body}</p>
+        </div>
+      </div>
+    `).join("");
+  });
+</script>
+</body>
+</html>
