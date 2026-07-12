@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Code Studio — Velox Lite AI Assistant</title>
+<meta name="description" content="Describe what you want and Velox Lite AI writes production-quality code — with instant live preview, copy and download.">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>.logo img{width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000;--violet:#8b5cf6;--purple:#a855f7;--neon:#c084fc;--deep:#6d28d9;
+    --text:#ececf1;--text-dim:#9ca3af;
+    --glass:rgba(255,255,255,.04);--glass-border:rgba(168,85,247,.22);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
+  }
+  button{font-family:inherit;}
+
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.26;animation:drift 18s ease-in-out infinite alternate;}
+  .orb.a{width:520px;height:520px;background:radial-gradient(circle,#7c3aed,transparent 70%);top:-160px;left:-120px;}
+  .orb.b{width:460px;height:460px;background:radial-gradient(circle,#a855f7,transparent 70%);bottom:-140px;right:-100px;animation-delay:-6s;animation-duration:22s;}
+  @keyframes drift{0%{transform:translate(0,0) scale(1);}50%{transform:translate(60px,-40px) scale(1.12);}100%{transform:translate(-50px,50px) scale(.95);}}
+  .grid-overlay{
+    position:absolute;inset:0;
+    background-image:linear-gradient(rgba(139,92,246,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.05) 1px,transparent 1px);
+    background-size:56px 56px;
+    mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);
+    -webkit-mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);
+  }
+  @keyframes appIn{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  .app{
+    position:relative;z-index:1;height:100dvh;
+    display:flex;flex-direction:column;gap:12px;
+    max-width:1200px;margin:0 auto;padding:14px;
+    animation:appIn .8s cubic-bezier(.22,1,.36,1) both;
+  }
+
+  header{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:12px 18px;
+    background:var(--glass);border:1px solid var(--glass-border);border-radius:18px;
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    box-shadow:0 0 40px rgba(139,92,246,.08);
+  }
+  .brand{display:flex;align-items:center;gap:11px;}
+  .logo{
+    width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--deep),var(--purple));
+    box-shadow:0 0 18px rgba(168,85,247,.55);
+    animation:logoPulse 3.2s ease-in-out infinite;
+  }
+  @keyframes logoPulse{0%,100%{box-shadow:0 0 18px rgba(168,85,247,.55);}50%{box-shadow:0 0 28px rgba(192,132,252,.85);}}
+  .grad{
+    font-weight:800;letter-spacing:-.02em;
+    background:linear-gradient(90deg,#e9d5ff,var(--neon),var(--purple),#e9d5ff);
+    background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:shine 5s linear infinite;
+  }
+  @keyframes shine{to{background-position:200% center;}}
+  .brand h1{font-size:1.1rem;}
+  .back-btn{
+    display:flex;align-items:center;gap:8px;
+    padding:9px 16px;border-radius:12px;cursor:pointer;text-decoration:none;
+    background:rgba(255,255,255,.05);border:1px solid rgba(168,85,247,.3);
+    color:var(--text-dim);font-size:.8rem;font-weight:600;transition:all .25s ease;
+  }
+  .back-btn:hover{color:#fff;border-color:var(--neon);box-shadow:0 0 16px rgba(168,85,247,.4);transform:translateY(-1px);}
+
+  .main{flex:1;min-height:0;display:flex;gap:12px;}
+
+  /* studio */
+  .stage{
+    flex:1;min-width:0;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02));
+    border:1px solid var(--glass-border);border-radius:22px;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    box-shadow:0 0 60px rgba(139,92,246,.1),0 24px 60px rgba(0,0,0,.6);
+    overflow:hidden;
+  }
+  .stage-head{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:8px 12px;border-bottom:1px solid rgba(168,85,247,.16);
+    background:rgba(168,85,247,.06);flex-wrap:wrap;
+  }
+  .tabbar{
+    display:flex;background:rgba(255,255,255,.05);border:1px solid rgba(168,85,247,.25);
+    border-radius:11px;padding:3px;
+  }
+  .tab-btn{
+    display:flex;align-items:center;gap:6px;
+    border:none;background:transparent;color:var(--text-dim);
+    font-size:.74rem;font-weight:600;padding:6px 16px;border-radius:8px;cursor:pointer;
+    transition:all .25s ease;
+  }
+  .tab-btn:hover{color:#fff;}
+  .tab-btn.active{background:linear-gradient(135deg,var(--deep),var(--purple));color:#fff;box-shadow:0 0 12px rgba(168,85,247,.4);}
+  .tab-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .lang-pill{
+    font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--neon);border:1px solid rgba(192,132,252,.4);background:rgba(168,85,247,.1);
+    padding:3px 10px;border-radius:999px;
+  }
+  .acts{display:flex;gap:6px;flex-wrap:wrap;}
+  .cbtn{
+    display:flex;align-items:center;gap:5px;
+    font-size:.7rem;font-weight:600;color:var(--text-dim);
+    background:rgba(255,255,255,.05);border:1px solid rgba(168,85,247,.25);
+    padding:6px 12px;border-radius:9px;cursor:pointer;transition:all .2s ease;
+  }
+  .cbtn:hover{color:#fff;border-color:var(--neon);box-shadow:0 0 12px rgba(168,85,247,.35);}
+  .cbtn.done{color:#34d399;border-color:rgba(52,211,153,.5);}
+
+  .stage-body{flex:1;min-height:0;position:relative;background:#0a0614;}
+  .code-pane{
+    position:absolute;inset:0;overflow:auto;display:none;
+    padding:18px 20px;
+  }
+  .code-pane.show{display:block;}
+  .code-pane::-webkit-scrollbar{width:6px;height:6px;}
+  .code-pane::-webkit-scrollbar-thumb{background:linear-gradient(var(--deep),var(--purple));border-radius:99px;}
+  .code-pane pre{margin:0;}
+  .code-pane code{
+    font-family:'SF Mono',Consolas,Menlo,monospace;font-size:.82rem;line-height:1.6;
+    color:#d8b4fe;white-space:pre;
+  }
+  .note-box{
+    margin-top:16px;padding:10px 14px;border-radius:12px;
+    background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.22);
+    font-size:.76rem;color:var(--text-dim);line-height:1.6;white-space:pre-wrap;
+    font-family:'Inter',sans-serif;
+  }
+  .prev-pane{position:absolute;inset:0;display:none;}
+  .prev-pane.show{display:block;}
+  .prev-pane iframe{width:100%;height:100%;border:none;display:block;background:#fff;}
+
+  .empty-stage{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    color:var(--text-dim);text-align:center;padding:20px;
+  }
+  .empty-stage .big{font-size:2.6rem;animation:float 4s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  .empty-stage p{font-size:.85rem;max-width:400px;line-height:1.6;}
+
+  .loading-stage{
+    position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    background:rgba(5,3,10,.85);backdrop-filter:blur(6px);z-index:5;
+  }
+  .loading-stage.show{display:flex;}
+  .spinner{
+    width:52px;height:52px;border-radius:50%;
+    border:3px solid rgba(168,85,247,.2);border-top-color:var(--neon);
+    animation:spin 1s linear infinite;
+    box-shadow:0 0 24px rgba(168,85,247,.3);
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-stage .lt{font-size:.82rem;color:var(--neon);font-weight:600;animation:blink 1.6s ease-in-out infinite;}
+
+  /* gallery */
+  .gallery{
+    width:250px;flex-shrink:0;display:flex;flex-direction:column;
+    background:rgba(10,6,18,.72);
+    border:1px solid rgba(168,85,247,.16);border-radius:22px;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    overflow:hidden;
+  }
+  .gal-head{padding:13px 15px 9px;font-size:.66rem;font-weight:800;color:#6b7280;letter-spacing:.12em;text-transform:uppercase;}
+  .gal-list{flex:1;overflow-y:auto;padding:0 9px 10px;display:flex;flex-direction:column;gap:6px;}
+  .gal-list::-webkit-scrollbar{width:5px;}
+  .gal-list::-webkit-scrollbar-thumb{background:linear-gradient(var(--deep),var(--purple));border-radius:99px;}
+  .gal-item{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 11px;border-radius:11px;cursor:pointer;
+    font-size:.78rem;color:var(--text-dim);
+    border:1px solid transparent;
+    transition:all .2s ease;animation:appIn .3s ease both;
+  }
+  .gal-item:hover{background:rgba(168,85,247,.1);color:#fff;}
+  .gal-item.active{background:rgba(168,85,247,.16);color:#fff;border-color:rgba(168,85,247,.3);}
+  .gal-item .gt{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+  .gal-item .gx{
+    background:none;border:none;color:#6b7280;cursor:pointer;font-size:.75rem;
+    width:20px;height:20px;border-radius:6px;display:none;place-items:center;
+  }
+  .gal-item:hover .gx{display:grid;}
+  .gal-item .gx:hover{color:#fca5a5;background:rgba(248,113,113,.12);}
+  .gal-empty{padding:10px 12px;font-size:.72rem;color:#4b5563;line-height:1.5;}
+
+  /* input */
+  .input-bar{
+    display:flex;flex-direction:column;gap:8px;
+    padding:12px 14px;
+    background:var(--glass);border:1px solid var(--glass-border);border-radius:18px;
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  .chips{display:flex;gap:7px;flex-wrap:wrap;}
+  .chip{
+    font-size:.72rem;font-weight:500;color:var(--text-dim);
+    background:rgba(255,255,255,.04);border:1px solid rgba(168,85,247,.2);
+    padding:6px 13px;border-radius:999px;cursor:pointer;transition:all .25s ease;
+  }
+  .chip:hover{color:#fff;border-color:var(--neon);background:rgba(168,85,247,.14);box-shadow:0 0 16px rgba(168,85,247,.35);transform:translateY(-2px);}
+  .input-inner{
+    display:flex;gap:10px;align-items:center;
+    background:rgba(255,255,255,.045);border:1px solid rgba(168,85,247,.25);
+    border-radius:15px;padding:5px 5px 5px 16px;
+    transition:border-color .3s ease,box-shadow .3s ease;
+  }
+  .input-inner:focus-within{border-color:var(--neon);box-shadow:0 0 0 3px rgba(168,85,247,.14),0 0 30px rgba(168,85,247,.25);}
+  #idea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:inherit;font-size:.92rem;padding:10px 0;min-width:0;}
+  #idea::placeholder{color:#6b7280;}
+  #gen{
+    display:flex;align-items:center;gap:8px;
+    padding:11px 22px;border-radius:12px;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--deep),var(--purple));color:#fff;
+    font-size:.86rem;font-weight:700;
+    box-shadow:0 0 16px rgba(168,85,247,.4);transition:all .25s ease;flex-shrink:0;
+  }
+  #gen:hover{transform:translateY(-2px);box-shadow:0 0 26px rgba(192,132,252,.75);}
+  #gen:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+
+  .toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;}
+  .toast{
+    padding:10px 18px;border-radius:12px;font-size:.8rem;font-weight:500;color:#fff;
+    background:linear-gradient(135deg,rgba(45,30,75,.95),rgba(20,14,36,.95));
+    border:1px solid var(--glass-border);box-shadow:0 0 30px rgba(139,92,246,.35);
+    animation:appIn .3s ease both;
+  }
+  .toast.out{transition:all .3s ease;opacity:0;transform:translateY(10px);}
+
+  @media (max-width:860px){
+    .gallery{display:none;}
+    .brand h1{font-size:.95rem;}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="grid-overlay"></div>
+  <div class="orb a"></div>
+  <div class="orb b"></div>
+</div>
+
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo"><img src="logo.svg" alt="Velox"></div>
+      <h1 class="grad">Velox Code Studio</h1>
+    </div>
+    <a class="back-btn" href="index.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to chat
+    </a>
+  </header>
+
+  <div class="main">
+    <div class="stage">
+      <div class="stage-head">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="tabbar">
+            <button class="tab-btn active" id="tabCode">&lt;/&gt; Code</button>
+            <button class="tab-btn" id="tabPrev">👁 Preview</button>
+          </div>
+          <span class="lang-pill" id="langPill" style="display:none">HTML</span>
+        </div>
+        <div class="acts">
+          <button class="cbtn" id="btnCopy">⧉ Copy</button>
+          <button class="cbtn" id="btnDl">⬇ Download</button>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="code-pane" id="codePane">
+          <pre><code id="codeEl"></code></pre>
+          <div class="note-box" id="noteBox" style="display:none"></div>
+        </div>
+        <div class="prev-pane" id="prevPane">
+          <iframe id="prevFrame" sandbox="allow-scripts"></iframe>
+        </div>
+        <div class="empty-stage" id="emptyStage">
+          <div class="big">👨‍💻</div>
+          <p><b style="color:#fff">Describe any code you want below</b><br>— portfolio website, snake game, login form, python script —<br>Velox writes it, and you can preview it live right here.</p>
+        </div>
+        <div class="loading-stage" id="loadingStage">
+          <div class="spinner"></div>
+          <div class="lt">Velox is writing your code...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gallery">
+      <div class="gal-head">My Snippets</div>
+      <div class="gal-list" id="galList"></div>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="chips" id="chips">
+      <button class="chip">Portfolio website with animations</button>
+      <button class="chip">Snake game in JavaScript</button>
+      <button class="chip">Login form with validation</button>
+      <button class="chip">Digital clock with neon style</button>
+      <button class="chip">Python password generator</button>
+    </div>
+    <div class="input-inner">
+      <input id="idea" type="text" placeholder="Describe the code you want..." autocomplete="off"/>
+      <button id="gen">⚡ Generate</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  const store={
+    get(k){try{return localStorage.getItem(k);}catch(e){return null;}},
+    set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+  };
+  const jget=(k,f)=>{const v=store.get(k);if(!v)return f;try{return JSON.parse(v);}catch(e){return f;}};
+  const jset=(k,v)=>store.set(k,JSON.stringify(v));
+  function toast(msg){
+    const t=document.createElement('div');t.className='toast';t.textContent=msg;
+    $('toastWrap').appendChild(t);
+    setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),350);},2600);
+  }
+  function copyText(t){
+    if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);
+    const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);
+    ta.select();try{document.execCommand('copy');}catch(e){}ta.remove();
+    return Promise.resolve();
+  }
+
+  /* ---- usage limits (shared with chat app) ---- */
+  const SUBS={
+    free:{msgs:2000},smart:{msgs:8000},pro:{msgs:10000},velox:{msgs:-1},
+    community:{msgs:8000},manager:{msgs:10000},coowner:{msgs:-1},owner:{msgs:-1}
+  };
+  function sessionEmail(){return store.get('vx_session')||null;}
+  function mySub(){
+    const em=sessionEmail();if(!em)return 'free';
+    const users=jget('vx_users',{});const u=users[em];
+    return (u&&u.sub&&SUBS[u.sub])?u.sub:'free';
+  }
+  function usageKey(){return 'vx_usage_'+(sessionEmail()||'guest');}
+  function canUse(){
+    const lim=SUBS[mySub()].msgs;if(lim<0)return true;
+    const today=new Date().toDateString();
+    const u=jget(usageKey(),null);
+    if(!u||u.d!==today)return true;
+    return (u.m||0)<lim;
+  }
+  function bumpUsage(){
+    const today=new Date().toDateString();
+    let u=jget(usageKey(),null);
+    if(!u||u.d!==today)u={d:today,m:0,i:0};
+    u.m++;jset(usageKey(),u);
+  }
+
+  /* ---- AI ---- */
+  const CODE_PROMPT="You are Velox Code, an elite senior software engineer. The user describes what code they want. Produce the BEST possible code: complete, production-quality, modern best practices, clean structure, edge cases handled, brief helpful comments. Prefer FULL working files over fragments. For anything visual (websites, games, UI) output a complete self-contained HTML document with inline CSS/JS. Reply with ONE fenced code block with the correct language tag (```html, ```javascript, ```python etc.) containing ALL the code, then OPTIONALLY a usage note of maximum 3 short lines after the block. Nothing else.";
+  async function askProxy(idea){
+    const res=await fetch("/api/chat",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        messages:[{role:"system",content:CODE_PROMPT},{role:"user",content:idea}],
+        model:"qwen/qwen3-coder:free",max_tokens:8000
+      })
+    });
+    const data=await res.json().catch(()=>null);
+    if(!data)throw new Error("HTTP "+res.status);
+    if(!res.ok||data.error)throw new Error(data.error||("HTTP "+res.status));
+    if(data.content)return data.content;
+    throw new Error("Empty response");
+  }
+  async function askFallback(idea){
+    const res=await fetch("https://text.pollinations.ai/openai",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"openai",messages:[{role:"system",content:CODE_PROMPT},{role:"user",content:idea}]})
+    });
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const ct=res.headers.get("content-type")||"";
+    if(ct.includes("application/json")){
+      const data=await res.json();
+      const msg=data.choices&&data.choices[0]&&data.choices[0].message;
+      if(msg&&msg.content)return msg.content;
+    }
+    const t=(await res.text()).trim();
+    if(t)return t;
+    throw new Error("Empty response");
+  }
+  function extract(reply){
+    let m=reply.match(/```(\w*)\s*\n?([\s\S]*?)```([\s\S]*)?$/);
+    if(m){
+      return {lang:(m[1]||'code').toLowerCase(),code:m[2].trim(),note:(m[3]||'').trim().slice(0,400)};
+    }
+    m=reply.match(/```(\w*)\s*\n?([\s\S]+)$/);
+    if(m&&m[2].length>40)return {lang:(m[1]||'code').toLowerCase(),code:m[2].trim(),note:''};
+    if(/^\s*<(!doctype|html)/i.test(reply))return {lang:'html',code:reply.trim(),note:''};
+    return null;
+  }
+
+  /* ---- preview builder ---- */
+  function buildPreview(item){
+    const c=item.code;
+    if(/^\s*<(!doctype|html)/i.test(c))return c;
+    if(/^(html|htm|svg|xml)$/.test(item.lang))return c;
+    if(/<\w+[^>]*>/.test(c)&&/(div|body|style|canvas|svg|h[1-6]|p\b|form|button|section|header)/i.test(c))return c;
+    if(/^(js|javascript)$/.test(item.lang)){
+      const safe=c.replace(/<\/script/gi,'<\\/script');
+      return '<!DOCTYPE html><html><body style="background:#0a0614;color:#d8b4fe;font-family:Consolas,monospace;padding:16px;font-size:13px"><div style="color:#c084fc;font-weight:bold;margin-bottom:10px">▶ Console output:</div><pre id="out"></pre><script>const out=document.getElementById("out");const log=(...a)=>{out.textContent+=a.map(x=>typeof x==="object"?JSON.stringify(x):x).join(" ")+"\\n";};console.log=log;console.error=log;console.warn=log;try{'+safe+'\n}catch(e){log("Error: "+e.message)}<\/script></body></html>';
+    }
+    if(/^css$/.test(item.lang)){
+      return '<!DOCTYPE html><html><head><style>'+c+'</style></head><body><div class="demo"><h1>Heading</h1><p>Paragraph text for CSS preview.</p><button>Button</button><a href="#">Link</a></div></body></html>';
+    }
+    return null;
+  }
+
+  /* ---- gallery ---- */
+  let snippets=jget('vx_codes',[]);
+  let current=null;
+  function saveSnips(){jset('vx_codes',snippets.slice(0,20));}
+  function renderGallery(){
+    const gl=$('galList');gl.innerHTML='';
+    if(!snippets.length){
+      const d=document.createElement('div');d.className='gal-empty';
+      d.textContent='Abhi khaali hai — pehla idea likho aur Generate dabao!';
+      gl.appendChild(d);return;
+    }
+    snippets.forEach(a=>{
+      const it=document.createElement('div');
+      it.className='gal-item'+(current&&current.id===a.id?' active':'');
+      it.innerHTML='<span>📄</span><span class="gt"></span><button class="gx" title="Delete">🗑</button>';
+      it.querySelector('.gt').textContent=a.title;
+      it.onclick=e=>{
+        if(e.target.closest('.gx')){
+          snippets=snippets.filter(x=>x.id!==a.id);saveSnips();
+          if(current&&current.id===a.id){current=null;showEmpty();}
+          renderGallery();return;
+        }
+        loadSnip(a);
+      };
+      gl.appendChild(it);
+    });
+  }
+  function showEmpty(){
+    $('emptyStage').style.display='flex';
+    $('codePane').classList.remove('show');
+    $('prevPane').classList.remove('show');
+    $('langPill').style.display='none';
+  }
+  function loadSnip(a){
+    current=a;
+    $('emptyStage').style.display='none';
+    $('codeEl').textContent=a.code;
+    $('langPill').textContent=(a.lang||'code').toUpperCase();
+    $('langPill').style.display='';
+    const nb=$('noteBox');
+    if(a.note){nb.textContent=a.note;nb.style.display='';}else nb.style.display='none';
+    const pv=buildPreview(a);
+    $('tabPrev').disabled=!pv;
+    $('tabPrev').title=pv?'':'Preview sirf HTML / JS / CSS ke liye hai';
+    switchTab('code');
+    renderGallery();
+  }
+  function switchTab(t){
+    $('tabCode').classList.toggle('active',t==='code');
+    $('tabPrev').classList.toggle('active',t==='prev');
+    $('codePane').classList.toggle('show',t==='code');
+    $('prevPane').classList.toggle('show',t==='prev');
+    if(t==='prev'&&current){
+      const pv=buildPreview(current);
+      if(pv)$('prevFrame').srcdoc=pv;
+    }
+  }
+  $('tabCode').onclick=()=>switchTab('code');
+  $('tabPrev').onclick=()=>{if(!$('tabPrev').disabled)switchTab('prev');else toast('Preview sirf HTML / JS / CSS code ke liye hai');};
+
+  /* ---- generate ---- */
+  let busy=false;
+  async function generate(raw){
+    const idea=(raw??$('idea').value).trim();
+    if(!idea||busy)return;
+    if(!canUse()){toast('🚫 Daily limit khatam — kal aana ya upgrade lena!');return;}
+    busy=true;$('gen').disabled=true;$('idea').value='';
+    $('emptyStage').style.display='none';
+    $('loadingStage').classList.add('show');
+    let item=null,err='';
+    try{item=extract(await askProxy(idea));}
+    catch(e){err=e.message;}
+    if(!item){
+      try{item=extract(await askFallback(idea));}
+      catch(e){err=e.message;}
+    }
+    $('loadingStage').classList.remove('show');
+    if(item){
+      item.id='c'+Date.now().toString(36);
+      item.title=idea.length>40?idea.slice(0,40)+'…':idea;
+      item.ts=Date.now();
+      snippets.unshift(item);saveSnips();
+      loadSnip(item);
+      bumpUsage();
+      toast('⚡ Code ready! Preview tab dekho');
+    }else{
+      showEmpty();
+      toast('⚠️ Code nahi ban paya ('+err+') — dobara try karo');
+    }
+    busy=false;$('gen').disabled=false;$('idea').focus();
+  }
+  $('gen').onclick=()=>generate();
+  $('idea').addEventListener('keydown',e=>{if(e.key==='Enter')generate();});
+  $('chips').addEventListener('click',e=>{
+    if(e.target.classList.contains('chip'))generate(e.target.textContent);
+  });
+
+  /* ---- actions ---- */
+  $('btnCopy').onclick=()=>{
+    if(!current)return;
+    copyText(current.code).then(()=>{
+      const b=$('btnCopy');b.classList.add('done');b.textContent='✓ Copied';
+      setTimeout(()=>{b.classList.remove('done');b.textContent='⧉ Copy';},1600);
+    });
+  };
+  const EXT={html:'html',htm:'html',javascript:'js',js:'js',python:'py',py:'py',css:'css',java:'java',cpp:'cpp',c:'c',php:'php',svg:'svg',xml:'xml',json:'json',sql:'sql',typescript:'ts',ts:'ts'};
+  $('btnDl').onclick=()=>{
+    if(!current)return;
+    const ext=EXT[current.lang]||'txt';
+    const b=new Blob([current.code],{type:'text/plain'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(b);
+    a.download='velox-code-'+current.id+'.'+ext;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    toast('⬇ Downloaded as .'+ext);
+  };
+
+  /* init */
+  renderGallery();
+  if(snippets.length)loadSnip(snippets[0]);
+  else showEmpty();
+  $('idea').focus();
+</script>
+
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+}
+</script>
+</body>
+</html>

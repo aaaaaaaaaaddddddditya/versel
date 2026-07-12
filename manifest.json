@@ -1,0 +1,21 @@
+{
+  "name": "Velox Lite AI Assistant",
+  "short_name": "Velox Lite",
+  "description": "Free smart AI chat with image generation, animations and code tools.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "New Chat", "url": "/", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Code Studio", "url": "/code.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Animations", "url": "/animations.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
+}

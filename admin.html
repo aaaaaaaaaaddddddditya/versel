@@ -3,231 +3,425 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel — Perkmc</title>
+<title>Admin — Velox Chat</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌲</text></svg>">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>.logo img{width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Bangers&family=Luckiest+Guy&family=Press+Start+2P&family=Orbitron:wght@600;700;800&family=Russo+One&family=Bebas+Neue&family=Titan+One&family=Bungee&family=Rubik+Mono+One&family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=Work+Sans:wght@400;500;600&family=Mulish:wght@400;500;600&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="admin.css">
-</head>
-<body class="admin-body">
-
-<!-- ================= LOGIN SCREEN ================= -->
-<div class="login-wrap" id="loginWrap">
-  <div class="login-card">
-    <div class="emoji-badge" style="width:60px;height:60px;font-size:2rem;margin:0 auto 16px;">🔒</div>
-    <h2 style="margin-bottom:4px;">Perkmc Admin</h2>
-    <p class="muted" style="margin-top:0;">Enter the admin password to continue.</p>
-    <input type="password" id="loginPassword" placeholder="Admin password" autocomplete="current-password">
-    <div class="login-error" id="loginError"></div>
-    <button class="btn btn-primary btn-block" id="loginBtn">🔑 Login</button>
-    <p class="muted" style="margin-top:16px; font-size:0.78rem;">Default password: <code>perkmc123</code> — change it in Security settings after logging in.</p>
-    <p class="muted" style="font-size:0.78rem;"><a href="index.html" style="text-decoration:underline;">← Back to site</a></p>
-  </div>
-</div>
-
-<!-- ================= ADMIN SHELL ================= -->
-<div class="admin-shell" id="adminShell" style="display:none;">
-  <aside class="admin-sidebar">
-    <div class="brand"><span class="brand-mark">🌲</span><span class="brand-name">Perkmc</span></div>
-
-    <button class="admin-nav-btn active" data-tab="dashboard">📊 Dashboard</button>
-    <button class="admin-nav-btn" data-tab="console">🖥️ Live Console</button>
-    <button class="admin-nav-btn" data-tab="settings">⚙️ Server Settings</button>
-    <button class="admin-nav-btn" data-tab="staff">🛡️ Staff Management</button>
-    <button class="admin-nav-btn" data-tab="categories">🗂️ Staff Categories</button>
-    <button class="admin-nav-btn" data-tab="announcements">📢 Announcements</button>
-    <button class="admin-nav-btn" data-tab="store">🛒 Store Items</button>
-    <button class="admin-nav-btn" data-tab="rules">📖 Rules</button>
-    <button class="admin-nav-btn" data-tab="appearance">🎨 Appearance &amp; Fonts</button>
-    <button class="admin-nav-btn" data-tab="security">🔐 Security</button>
-
-    <hr style="border-color: var(--border-soft); margin: 16px 0;">
-    <a href="index.html" class="admin-nav-btn" style="display:flex;">🏠 View Site</a>
-    <button class="admin-nav-btn" id="logoutBtn">🚪 Log Out</button>
-  </aside>
-
-  <main class="admin-main">
-
-    <!-- DASHBOARD -->
-    <section class="admin-panel-view active" id="tab-dashboard">
-      <div class="admin-topbar"><h2>📊 Dashboard</h2></div>
-      <div class="grid grid-3" id="dashboardStats"></div>
-      <div class="card" style="margin-top:24px;">
-        <h3>👋 Welcome to your Admin Panel</h3>
-        <p>Use the sidebar to change your server IP, manage staff, post announcements, edit store items &amp; rules, and pick site fonts. Every change saves instantly and shows up live on the site (in this browser).</p>
-        <p class="muted">⚠️ This panel stores data in this browser's local storage. It's perfect for a solo owner or small team editing from one device. If several people need to manage the site from different devices, you'll eventually want a real backend — see the README.</p>
-      </div>
-    </section>
-
-    <!-- CONSOLE -->
-    <section class="admin-panel-view" id="tab-console">
-      <div class="admin-topbar"><h2>🖥️ Live Console</h2></div>
-
-      <div class="card" id="consoleSetupNotice" style="display:none;">
-        <h3>⚠️ Not connected yet</h3>
-        <p>The Live Console needs a free Firebase project to show real visitor activity — right now it has nothing to read from. Open <code>firebase-config.js</code> in your site files and follow the numbered steps in the comment at the top, then reload this page.</p>
-      </div>
-
-      <div class="grid grid-3" id="consoleStats" style="margin-bottom:18px;"></div>
-
-      <div class="card">
-        <h3 style="margin-bottom:10px;">👥 Players Seen</h3>
-        <table class="data-table">
-          <thead><tr><th>Player</th><th>Last Seen</th><th>Events</th></tr></thead>
-          <tbody id="consolePlayersBody"></tbody>
-        </table>
-      </div>
-
-      <div class="card" style="margin-top:20px;">
-        <h3 style="margin-bottom:10px;">📜 Live Activity Feed</h3>
-        <p class="muted" style="margin-top:0;">Real visitor actions on your live site — page views, IP copies, username entries, store clicks — updating live, newest first.</p>
-        <table class="data-table">
-          <thead><tr><th>Time</th><th>Player</th><th>Action</th><th>Details</th><th>Page</th></tr></thead>
-          <tbody id="consoleFeedBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- SETTINGS -->
-    <section class="admin-panel-view" id="tab-settings">
-      <div class="admin-topbar"><h2>⚙️ Server Settings</h2><button class="btn btn-primary btn-sm" id="saveSettings">💾 Save Changes</button></div>
-      <div class="card">
-        <div class="form-grid">
-          <div class="form-field"><label>🏷️ Site Name</label><input id="f-siteName"></div>
-          <div class="form-field"><label>🏷️ Tagline</label><input id="f-tagline"></div>
-          <div class="form-field"><label>🖥️ Server IP (Java)</label><input id="f-ipJava"></div>
-          <div class="form-field"><label>🎮 Server IP (Bedrock)</label><input id="f-ipBedrock"></div>
-          <div class="form-field"><label>🧱 Version</label><input id="f-version"></div>
-          <div class="form-field"><label>🟢 Players Online</label><input id="f-playersOnline" type="number"></div>
-          <div class="form-field"><label>👥 Players Max</label><input id="f-playersMax" type="number"></div>
-          <div class="form-field"><label>💬 Discord Invite URL</label><input id="f-discordInvite"></div>
-          <div class="form-field"><label>🌟 Hero Highlight Text</label><input id="f-heroHighlight"></div>
-          <div class="form-field"><label>📝 Hero Subtitle</label><input id="f-heroSubtitle"></div>
-        </div>
-        <h3 style="margin-top:10px;">🔗 Social Links</h3>
-        <div class="form-grid">
-          <div class="form-field"><label>💬 Discord</label><input id="f-social-discord"></div>
-          <div class="form-field"><label>📺 YouTube</label><input id="f-social-youtube"></div>
-          <div class="form-field"><label>🎵 TikTok</label><input id="f-social-tiktok"></div>
-          <div class="form-field"><label>📸 Instagram</label><input id="f-social-instagram"></div>
-          <div class="form-field"><label>🐦 Twitter / X</label><input id="f-social-twitter"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- STAFF -->
-    <section class="admin-panel-view" id="tab-staff">
-      <div class="admin-topbar"><h2>🛡️ Staff Management</h2><button class="btn btn-primary btn-sm" id="addStaffBtn">➕ Add Staff Member</button></div>
-      <div class="card">
-        <table class="data-table">
-          <thead><tr><th>Emoji</th><th>Name</th><th>Category</th><th>Note</th><th>Actions</th></tr></thead>
-          <tbody id="staffTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- CATEGORIES -->
-    <section class="admin-panel-view" id="tab-categories">
-      <div class="admin-topbar"><h2>🗂️ Staff Categories</h2></div>
-      <div class="card">
-        <p class="muted">Create ranks/categories like Helper, Moderator, Admin, Builder, etc. Order here controls display order on the Staff page.</p>
-        <div class="form-grid" style="grid-template-columns: 2fr 1fr;">
-          <div class="form-field"><label>New category name</label><input id="f-newCategory" placeholder="e.g. Head Admin"></div>
-          <div class="form-field"><label>&nbsp;</label><button class="btn btn-primary" id="addCategoryBtn">➕ Add Category</button></div>
-        </div>
-        <table class="data-table">
-          <thead><tr><th>#</th><th>Category</th><th>Members</th><th>Actions</th></tr></thead>
-          <tbody id="categoryTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ANNOUNCEMENTS -->
-    <section class="admin-panel-view" id="tab-announcements">
-      <div class="admin-topbar"><h2>📢 Announcements</h2><button class="btn btn-primary btn-sm" id="addAnnouncementBtn">➕ New Announcement</button></div>
-      <div class="card">
-        <table class="data-table">
-          <thead><tr><th>Emoji</th><th>Title</th><th>Tag</th><th>Date</th><th>Actions</th></tr></thead>
-          <tbody id="announcementTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- STORE -->
-    <section class="admin-panel-view" id="tab-store">
-      <div class="admin-topbar"><h2>🛒 Store Items</h2><button class="btn btn-primary btn-sm" id="addStoreBtn">➕ New Item</button></div>
-      <div class="card">
-        <table class="data-table">
-          <thead><tr><th>Emoji</th><th>Name</th><th>Price</th><th>Tag</th><th>Actions</th></tr></thead>
-          <tbody id="storeTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- RULES -->
-    <section class="admin-panel-view" id="tab-rules">
-      <div class="admin-topbar"><h2>📖 Rules</h2><button class="btn btn-primary btn-sm" id="addRuleGroupBtn">➕ New Rule Category</button></div>
-      <div id="rulesAdminList"></div>
-    </section>
-
-    <!-- APPEARANCE -->
-    <section class="admin-panel-view" id="tab-appearance">
-      <div class="admin-topbar"><h2>🎨 Appearance &amp; Fonts</h2></div>
-      <div class="card">
-        <h3>🔠 Heading / Display Font <span class="badge-count" id="headingFontCount"></span></h3>
-        <p class="muted">Used for big titles, the logo and section headings.</p>
-        <div class="font-preview-grid" id="headingFontGrid"></div>
-      </div>
-      <div class="card" style="margin-top:20px;">
-        <h3>🔡 Body / Small Font <span class="badge-count" id="smallFontCount"></span></h3>
-        <p class="muted">Used for paragraphs, buttons and small text.</p>
-        <div class="font-preview-grid" id="smallFontGrid"></div>
-      </div>
-      <div class="card" style="margin-top:20px;">
-        <h3>😀 Emoji Library</h3>
-        <p class="muted">Click any emoji to copy it, then paste it into names, notes, titles or rules anywhere in this panel.</p>
-        <div class="emoji-picker" id="emojiLibrary" style="max-width:100%;"></div>
-      </div>
-    </section>
-
-    <!-- SECURITY -->
-    <section class="admin-panel-view" id="tab-security">
-      <div class="admin-topbar"><h2>🔐 Security</h2></div>
-      <div class="card" style="max-width:420px;">
-        <h3>Change Admin Password</h3>
-        <div class="form-field"><label>New password</label><input type="password" id="f-newPassword"></div>
-        <div class="form-field"><label>Confirm new password</label><input type="password" id="f-confirmPassword"></div>
-        <div class="login-error" id="passwordError"></div>
-        <button class="btn btn-primary" id="changePasswordBtn">💾 Update Password</button>
-        <p class="muted" style="margin-top:14px;">This password only protects this Admin Panel from casual visitors — it is not a substitute for real authentication. Anyone with access to this browser profile or the page source can bypass it. Don't use it to guard sensitive data.</p>
-      </div>
-      <div class="card" style="margin-top:20px; max-width:420px;">
-        <h3>♻️ Reset Everything</h3>
-        <p class="muted">Wipes all saved settings, staff, announcements &amp; store items back to the sample defaults.</p>
-        <button class="btn btn-danger" id="resetAllBtn">⚠️ Reset to Defaults</button>
-      </div>
-    </section>
-
-  </main>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<!-- ================= MODAL (used for add/edit forms) ================= -->
-<div id="modalOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; padding:20px;">
-  <div class="card" id="modalBox" style="max-width:480px; width:100%; max-height:85vh; overflow-y:auto;">
-    <div id="modalContent"></div>
-  </div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="config.js"></script>
-<script src="store-icons.js"></script>
-<script src="admin.js"></script>
+<style>
+  :root{
+    --bg:#000;--violet:#8b5cf6;--purple:#a855f7;--neon:#c084fc;--deep:#6d28d9;
+    --text:#ececf1;--text-dim:#9ca3af;
+    --glass:rgba(255,255,255,.04);--glass-border:rgba(168,85,247,.22);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{min-height:100%;}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;}
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.24;animation:drift 18s ease-in-out infinite alternate;}
+  .orb.a{width:520px;height:520px;background:radial-gradient(circle,#7c3aed,transparent 70%);top:-160px;left:-120px;}
+  .orb.b{width:460px;height:460px;background:radial-gradient(circle,#a855f7,transparent 70%);bottom:-140px;right:-100px;animation-delay:-6s;}
+  @keyframes drift{0%{transform:translate(0,0);}100%{transform:translate(-50px,50px);}}
+  @keyframes appIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .grad{
+    font-weight:800;letter-spacing:-.02em;
+    background:linear-gradient(90deg,#e9d5ff,var(--neon),var(--purple),#e9d5ff);
+    background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:shine 5s linear infinite;
+  }
+  @keyframes shine{to{background-position:200% center;}}
+  .logo{
+    width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--deep),var(--purple));
+    box-shadow:0 0 20px rgba(168,85,247,.55);
+  }
+
+  /* ---- login gate ---- */
+  .gate{position:relative;z-index:1;min-height:100dvh;display:none;place-items:center;padding:16px;}
+  .gate.show{display:grid;}
+  .gate-card{
+    width:100%;max-width:380px;padding:32px 28px;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+    border:1px solid var(--glass-border);border-radius:24px;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    box-shadow:0 0 60px rgba(139,92,246,.14);
+    display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;
+    animation:appIn .6s cubic-bezier(.22,1,.36,1) both;
+  }
+  .gate-card h1{font-size:1.25rem;}
+  .gate-card p{font-size:.76rem;color:var(--text-dim);line-height:1.5;}
+  .gate-card input{
+    width:100%;padding:12px 15px;border-radius:12px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(168,85,247,.25);
+    color:var(--text);font-family:inherit;font-size:.9rem;outline:none;text-align:center;
+    transition:all .25s ease;
+  }
+  .gate-card input:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(168,85,247,.14);}
+  .gate-err{display:none;font-size:.74rem;color:#fca5a5;}
+  .gate-err.show{display:block;}
+  .primary-btn{
+    width:100%;padding:12px;border:none;border-radius:12px;cursor:pointer;
+    background:linear-gradient(135deg,var(--deep),var(--purple));color:#fff;
+    font-size:.88rem;font-weight:700;box-shadow:0 0 18px rgba(168,85,247,.4);
+    transition:all .25s ease;
+  }
+  .primary-btn:hover{transform:translateY(-2px);box-shadow:0 0 28px rgba(192,132,252,.7);}
+
+  /* ---- panel ---- */
+  .panel{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:20px 16px 60px;display:none;animation:appIn .7s cubic-bezier(.22,1,.36,1) both;}
+  .panel.show{display:block;}
+  .p-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    padding:14px 20px;margin-bottom:22px;
+    background:var(--glass);border:1px solid var(--glass-border);border-radius:18px;
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  .p-head .l{display:flex;align-items:center;gap:12px;}
+  .p-head .l .logo{width:36px;height:36px;border-radius:11px;}
+  .p-head h1{font-size:1.1rem;}
+  .p-head .r{display:flex;gap:8px;flex-wrap:wrap;}
+  .ghost-btn{
+    padding:9px 15px;border-radius:11px;cursor:pointer;text-decoration:none;
+    background:rgba(255,255,255,.05);border:1px solid rgba(168,85,247,.3);
+    color:var(--text-dim);font-size:.78rem;font-weight:600;transition:all .25s ease;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .ghost-btn:hover{color:#fff;border-color:var(--neon);box-shadow:0 0 14px rgba(168,85,247,.35);}
+  .ghost-btn.danger:hover{color:#fca5a5;border-color:rgba(248,113,113,.5);box-shadow:0 0 14px rgba(248,113,113,.25);}
+
+  .note{
+    padding:12px 16px;border-radius:14px;margin-bottom:22px;
+    background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.3);
+    font-size:.74rem;color:#fcd34d;line-height:1.6;
+  }
+
+  .sec-title{font-size:.72rem;font-weight:800;color:#6b7280;letter-spacing:.12em;text-transform:uppercase;margin:26px 4px 12px;}
+
+  .card{
+    padding:20px;border-radius:18px;margin-bottom:14px;
+    background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02));
+    border:1px solid var(--glass-border);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .grid3{display:grid;grid-template-columns:1.2fr .6fr .6fr;gap:12px;}
+  .f{margin-bottom:12px;}
+  .f label{display:block;font-size:.66rem;font-weight:700;color:var(--neon);margin-bottom:5px;letter-spacing:.06em;text-transform:uppercase;}
+  .f input,.f textarea{
+    width:100%;padding:10px 13px;border-radius:11px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(168,85,247,.25);
+    color:var(--text);font-family:inherit;font-size:.84rem;outline:none;
+    transition:all .25s ease;resize:vertical;
+  }
+  .f textarea{min-height:84px;line-height:1.55;}
+  .f input:focus,.f textarea:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(168,85,247,.12);}
+  .toggles{display:flex;gap:18px;flex-wrap:wrap;margin-top:4px;}
+  .tog{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text-dim);cursor:pointer;user-select:none;}
+  .tog input{accent-color:var(--purple);width:15px;height:15px;cursor:pointer;}
+  .plan-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .plan-card-head .nm{font-size:.95rem;font-weight:800;}
+  .pill{
+    font-size:.6rem;font-weight:800;letter-spacing:.1em;padding:3px 10px;border-radius:999px;
+    color:#fbbf24;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);
+  }
+  .pill.live{color:#34d399;border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.08);}
+
+  .savebar{
+    position:sticky;bottom:14px;z-index:5;display:flex;gap:10px;margin-top:24px;
+    padding:12px;border-radius:16px;
+    background:rgba(12,8,22,.9);border:1px solid var(--glass-border);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    box-shadow:0 0 40px rgba(139,92,246,.2),0 14px 30px rgba(0,0,0,.6);
+  }
+  .savebar .primary-btn{flex:2;}
+  .savebar .ghost-btn{flex:1;justify-content:center;}
+
+  table{width:100%;border-collapse:collapse;font-size:.78rem;}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid rgba(168,85,247,.12);}
+  th{color:var(--neon);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;}
+  td{color:#c9c9d4;}
+  .empty{font-size:.76rem;color:#6b7280;padding:8px 4px;}
+
+  .toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;}
+  .toast{
+    padding:10px 18px;border-radius:12px;font-size:.8rem;font-weight:500;color:#fff;
+    background:linear-gradient(135deg,rgba(45,30,75,.95),rgba(20,14,36,.95));
+    border:1px solid var(--glass-border);box-shadow:0 0 30px rgba(139,92,246,.35);
+    animation:appIn .3s ease both;
+  }
+  .toast.out{transition:all .3s ease;opacity:0;transform:translateY(10px);}
+
+  @media(max-width:680px){.grid2,.grid3{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="bg"><div class="orb a"></div><div class="orb b"></div></div>
+
+<!-- login gate -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="logo"><img src="logo.svg" alt="Velox"></div>
+    <h1 class="grad" id="gateTitle">Velox Admin</h1>
+    <p id="gateSub">Enter the admin password to continue.</p>
+    <input type="password" id="gatePass" placeholder="Admin password">
+    <input type="password" id="gatePass2" placeholder="Confirm password" style="display:none">
+    <div class="gate-err" id="gateErr"></div>
+    <button class="primary-btn" id="gateBtn">Unlock</button>
+    <p style="font-size:.64rem;color:#4b5563;">Panel data is stored in this browser (static site — no server).</p>
+  </div>
+</div>
+
+<!-- panel -->
+<div class="panel" id="panel">
+  <div class="p-head">
+    <div class="l">
+      <div class="logo"><img src="logo.svg" alt="Velox"></div>
+      <h1 class="grad">Velox Admin Panel</h1>
+    </div>
+    <div class="r">
+      <a class="ghost-btn" href="index.html">💬 Chat</a>
+      <a class="ghost-btn" href="plans.html" target="_blank">💎 View Plans page</a>
+      <button class="ghost-btn danger" id="logoutBtn">🚪 Lock panel</button>
+    </div>
+  </div>
+
+  <div class="note">
+    ⚠️ This is a static site (no backend). Changes here are saved in <b>this browser's storage</b> — they show on the Plans page when opened in the same browser. For changes visible to all visitors, edit the defaults in <b>config.js</b> and redeploy on Vercel (I can generate the updated config.js for you anytime).
+  </div>
+
+  <div class="sec-title">🌐 Community / Discord</div>
+  <div class="card">
+    <div class="f">
+      <label>Discord invite link</label>
+      <input id="discordIn" type="text" placeholder="https://discord.gg/your-invite">
+    </div>
+    <div class="f">
+      <label>Community tagline</label>
+      <input id="commTagIn" type="text" placeholder="Free subscription through our Discord community">
+    </div>
+    <div class="f" style="margin-bottom:0">
+      <label>Ticket steps (one per line)</label>
+      <textarea id="commStepsIn"></textarea>
+    </div>
+  </div>
+
+  <div class="sec-title">🧠 AI Knowledge</div>
+  <div class="card">
+    <div class="f" style="margin-bottom:0">
+      <label>Custom knowledge — AI isse sach maan ke jawab dega (YoMetro, Velox, kuch bhi likho)</label>
+      <textarea id="knowledgeIn" style="min-height:130px"></textarea>
+    </div>
+  </div>
+
+  <div class="sec-title">💎 Plans</div>
+  <div id="plansEditor"></div>
+
+  <div class="sec-title">👥 Users & Subscriptions (this browser)</div>
+  <div class="card" id="usersCard"></div>
+
+  <div class="savebar">
+    <button class="primary-btn" id="saveAll">💾 Save all changes</button>
+    <button class="ghost-btn" id="exportCfg">📤 Export config.js</button>
+    <button class="ghost-btn danger" id="resetAll">↺ Reset defaults</button>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  const store={
+    get(k){try{return localStorage.getItem(k);}catch(e){return null;}},
+    set(k,v){try{localStorage.setItem(k,v);}catch(e){}},
+    del(k){try{localStorage.removeItem(k);}catch(e){}}
+  };
+  function hashPass(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))>>>0;}return 'h'+h.toString(36)+'_'+s.length;}
+  function toast(msg){
+    const t=document.createElement('div');t.className='toast';t.textContent=msg;
+    $('toastWrap').appendChild(t);
+    setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),350);},2400);
+  }
+
+  /* ---------- gate ---------- */
+  const savedPass=store.get('vx_admin_pass');
+  const firstTime=!savedPass;
+  if(firstTime){
+    $('gateTitle').textContent='Set Admin Password';
+    $('gateSub').textContent='First time here — create the admin password for this panel.';
+    $('gatePass2').style.display='';
+    $('gateBtn').textContent='Create & unlock';
+  }
+  function gateErr(m){const e=$('gateErr');e.textContent=m;e.classList.add('show');}
+  $('gateBtn').onclick=()=>{
+    const p=$('gatePass').value;
+    if(!p||p.length<4)return gateErr('Password must be at least 4 characters.');
+    if(firstTime){
+      if(p!==$('gatePass2').value)return gateErr('Passwords do not match.');
+      store.set('vx_admin_pass',hashPass(p));
+      openPanel();toast('Admin password set 🔐');
+    }else{
+      if(hashPass(p)!==savedPass)return gateErr('Wrong password.');
+      openPanel();
+    }
+  };
+  $('gatePass').addEventListener('keydown',e=>{if(e.key==='Enter')$('gateBtn').click();});
+  $('gatePass2').addEventListener('keydown',e=>{if(e.key==='Enter')$('gateBtn').click();});
+  $('logoutBtn').onclick=()=>{location.reload();};
+
+  /* ---------- panel ---------- */
+  let cfg=null;
+  function openPanel(){
+    $('gate').classList.remove('show');
+    $('panel').classList.add('show');
+    cfg=window.vxGetCfg();
+    // community
+    $('discordIn').value=cfg.discord||'';
+    $('commTagIn').value=(cfg.community&&cfg.community.tag)||'';
+    $('commStepsIn').value=((cfg.community&&cfg.community.steps)||[]).join('\n');
+    $('knowledgeIn').value=cfg.knowledge||'';
+    // plans
+    renderPlansEditor();
+    renderUsers();
+  }
+
+  function renderPlansEditor(){
+    const box=$('plansEditor');box.innerHTML='';
+    cfg.plans.forEach((p,i)=>{
+      const c=document.createElement('div');c.className='card';
+      c.innerHTML=
+        '<div class="plan-card-head"><span class="nm"></span><span class="pill '+(p.soon?'':'live')+'">'+(p.soon?'COMING SOON':'LIVE')+'</span></div>'+
+        '<div class="grid3">'+
+          '<div class="f"><label>Plan name</label><input class="pi-name" type="text"></div>'+
+          '<div class="f"><label>Price</label><input class="pi-price" type="text"></div>'+
+          '<div class="f"><label>Period</label><input class="pi-period" type="text" placeholder="/month"></div>'+
+        '</div>'+
+        '<div class="f"><label>Tagline</label><input class="pi-tag" type="text"></div>'+
+        '<div class="f"><label>Features (one per line)</label><textarea class="pi-feats"></textarea></div>'+
+        '<div class="toggles">'+
+          '<label class="tog"><input type="checkbox" class="pi-soon"> Coming Soon badge</label>'+
+          '<label class="tog"><input type="checkbox" class="pi-hl"> Highlight (Most Popular)</label>'+
+        '</div>';
+      c.querySelector('.nm').textContent=p.name;
+      c.querySelector('.pi-name').value=p.name;
+      c.querySelector('.pi-price').value=p.price;
+      c.querySelector('.pi-period').value=p.period||'';
+      c.querySelector('.pi-tag').value=p.tag||'';
+      c.querySelector('.pi-feats').value=(p.features||[]).join('\n');
+      c.querySelector('.pi-soon').checked=!!p.soon;
+      c.querySelector('.pi-hl').checked=!!p.highlight;
+      c.dataset.idx=i;
+      box.appendChild(c);
+    });
+  }
+
+  const SUB_OPTS=[['free','Free'],['community','Community'],['smart','Smart'],['pro','Pro'],['velox','Velox'],['manager','Manager (90%)'],['coowner','Co-Owner (\u221e)'],['owner','Owner (\u221e)']];
+  function renderUsers(){
+    const box=$('usersCard');
+    let users={};
+    try{users=JSON.parse(store.get('vx_users')||'{}');}catch(e){}
+    const list=Object.values(users);
+    if(!list.length){box.innerHTML='<div class="empty">No registered users yet (users register on the chat page, stored per browser).</div>';return;}
+    box.innerHTML='<table><thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Usage today</th><th>Subscription</th></tr></thead><tbody></tbody></table>'+
+      '<div class="empty" style="margin-top:10px">\ud83d\udd12 Hidden tiers \u2014 Owner (\u221e), Co-Owner (\u221e), Manager (90%) \u2014 sirf yahin se milte hain, Plans page pe nahi dikhte. Community/Smart/Pro/Velox bhi yahin se grant karo (Discord ticket ke baad). Modes: Normal=sabko, Nobble=Smart+, Fry=Pro+ \u2014 hidden tiers ko sab modes milte hain. Dropdown badalte hi save ho jata hai.</div>';
+    const tb=box.querySelector('tbody');
+    list.forEach(u=>{
+      const tr=document.createElement('tr');
+      let usage={m:0,i:0};
+      try{const g=JSON.parse(store.get('vx_usage_'+u.email)||'null');if(g&&g.d===new Date().toDateString())usage=g;}catch(e){}
+      const t1=document.createElement('td');t1.textContent=u.username;
+      const t2=document.createElement('td');t2.textContent=u.name;
+      const t3=document.createElement('td');t3.textContent=u.email;
+      const t4=document.createElement('td');t4.textContent=(usage.m||0)+' msgs \u00b7 '+(usage.i||0)+' imgs';
+      const t5=document.createElement('td');
+      const sel=document.createElement('select');
+      sel.style.cssText='background:rgba(255,255,255,.05);border:1px solid rgba(168,85,247,.3);color:#ececf1;border-radius:8px;padding:5px 8px;font-family:inherit;font-size:.76rem;cursor:pointer;';
+      SUB_OPTS.forEach(p=>{const o=document.createElement('option');o.value=p[0];o.textContent=p[1];o.style.background='#14101f';sel.appendChild(o);});
+      sel.value=(u.sub&&SUB_OPTS.some(p=>p[0]===u.sub))?u.sub:'free';
+      sel.onchange=()=>{
+        const all=JSON.parse(store.get('vx_users')||'{}');
+        if(all[u.email]){
+          all[u.email].sub=sel.value;
+          store.set('vx_users',JSON.stringify(all));
+          toast('\u2705 '+u.username+' \u2192 '+sel.options[sel.selectedIndex].text);
+        }
+      };
+      t5.appendChild(sel);
+      tr.append(t1,t2,t3,t4,t5);
+      tb.appendChild(tr);
+    });
+  }
+
+  $('saveAll').onclick=()=>{
+    // community
+    cfg.discord=$('discordIn').value.trim()||cfg.discord;
+    cfg.community=cfg.community||{};
+    cfg.community.title=cfg.community.title||'Community';
+    cfg.community.tag=$('commTagIn').value.trim();
+    cfg.community.steps=$('commStepsIn').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    cfg.knowledge=$('knowledgeIn').value.trim();
+    // plans
+    document.querySelectorAll('#plansEditor .card').forEach(c=>{
+      const p=cfg.plans[+c.dataset.idx];
+      p.name=c.querySelector('.pi-name').value.trim()||p.name;
+      p.price=c.querySelector('.pi-price').value.trim()||p.price;
+      p.period=c.querySelector('.pi-period').value.trim();
+      p.tag=c.querySelector('.pi-tag').value.trim();
+      p.features=c.querySelector('.pi-feats').value.split('\n').map(s=>s.trim()).filter(Boolean);
+      p.soon=c.querySelector('.pi-soon').checked;
+      p.highlight=c.querySelector('.pi-hl').checked;
+    });
+    window.vxSaveCfg(cfg);
+    renderPlansEditor();
+    toast('✅ Saved! Plans page updated (this browser).');
+  };
+
+  $('resetAll').onclick=()=>{
+    window.vxResetCfg();
+    cfg=window.vxGetCfg();
+    openPanel();
+    toast('↺ Reset to config.js defaults');
+  };
+
+  $('exportCfg').onclick=()=>{
+    // builds a fresh config.js with current values so user can redeploy for ALL visitors
+    const out="/* Velox shared config — generated from Admin Panel */\n"+
+      "window.VX_DEFAULT_CFG = "+JSON.stringify({discord:cfg.discord,knowledge:cfg.knowledge,plans:cfg.plans,community:cfg.community},null,2)+";\n\n"+
+      "window.vxGetCfg = function () {\n  try {\n    const s = localStorage.getItem(\"vx_cfg\");\n    if (s) {\n      const c = JSON.parse(s);\n      if (c && Array.isArray(c.plans) && c.plans.length) {\n        if (!c.community) c.community = JSON.parse(JSON.stringify(window.VX_DEFAULT_CFG.community));\n        return c;\n      }\n    }\n  } catch (e) {}\n  return JSON.parse(JSON.stringify(window.VX_DEFAULT_CFG));\n};\n\n"+
+      "window.vxSaveCfg = function (c) {\n  try { localStorage.setItem(\"vx_cfg\", JSON.stringify(c)); return true; } catch (e) { return false; }\n};\n\n"+
+      "window.vxResetCfg = function () {\n  try { localStorage.removeItem(\"vx_cfg\"); } catch (e) {}\n};\n";
+    const blob=new Blob([out],{type:'text/javascript'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='config.js';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('📤 config.js downloaded — replace it in your project & redeploy');
+  };
+
+  /* init */
+  $('gate').classList.add('show');
+</script>
+
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+}
+</script>
 </body>
 </html>
